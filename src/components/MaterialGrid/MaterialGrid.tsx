@@ -1,10 +1,6 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { Shield, Zap, Droplets, Wind } from 'lucide-react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { motion } from 'motion/react';
-
-gsap.registerPlugin(ScrollTrigger);
 
 const MATERIALS = [
   {
@@ -37,27 +33,20 @@ const MATERIALS = [
   }
 ];
 
+const cardVariants: any = {
+  hidden: { opacity: 0, y: 30 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      delay: i * 0.1,
+      ease: "easeOut",
+    }
+  })
+};
+
 export const MaterialGrid = () => {
-  const gridRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.from('.material-card', {
-        y: 100,
-        opacity: 0,
-        duration: 0.8,
-        stagger: 0.2,
-        ease: 'power3.out',
-        scrollTrigger: {
-          trigger: gridRef.current,
-          start: 'top 80%',
-        }
-      });
-    }, gridRef);
-
-    return () => ctx.revert();
-  }, []);
-
   return (
     <section className="py-32 bg-[#131313] text-white relative overflow-hidden" id="materials">
       {/* Background wireframe accent */}
@@ -65,26 +54,40 @@ export const MaterialGrid = () => {
            style={{ backgroundImage: 'linear-gradient(#FF6B00 1px, transparent 1px), linear-gradient(90deg, #FF6B00 1px, transparent 1px)', backgroundSize: '50px 50px' }}>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="mb-24"
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="mb-16 md:mb-24"
         >
-          <h2 className="font-display text-5xl sm:text-6xl md:text-8xl font-black uppercase tracking-tighter mb-6 leading-[0.9]">
+          <h2 className="font-display text-4xl sm:text-6xl md:text-8xl font-black uppercase tracking-tighter mb-6 leading-[0.9]">
             Industrial <br className="hidden md:block" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B00] to-orange-400">Grade</span>
           </h2>
-          <p className="text-lg md:text-xl text-gray-400 max-w-2xl font-light leading-relaxed">
+          <p className="text-base md:text-xl text-gray-400 max-w-2xl font-light leading-relaxed">
             Engineered for the extreme Middle Eastern climate. Our courts combine structural integrity with aesthetic perfection.
           </p>
         </motion.div>
 
-        <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {MATERIALS.map((mat, idx) => (
-            <div key={idx} className="material-card group relative bg-[#1A1A1A] border border-gray-800 overflow-hidden hover:border-[#FF6B00] transition-colors duration-500 magnetic view-project cursor-pointer">
+            <motion.div 
+              key={mat.title} 
+              custom={idx}
+              variants={cardVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.1 }}
+              whileHover={{ 
+                y: -10, 
+                borderColor: '#E85D04',
+                boxShadow: '0 20px 40px rgba(232, 93, 4, 0.15)',
+                scale: 1.02
+              }}
+              className="material-card group relative bg-[#1A1A1A] border border-gray-800 overflow-hidden transition-all duration-500 magnetic view-project cursor-pointer"
+            >
               <div className="h-56 overflow-hidden">
                 <img 
                   src={mat.image} 
@@ -94,14 +97,14 @@ export const MaterialGrid = () => {
                 />
               </div>
               <div className="p-8 relative">
-                <div className="absolute -top-8 right-8 w-16 h-16 bg-[#FF6B00] flex items-center justify-center rounded-sm shadow-lg transform group-hover:-translate-y-2 transition-transform duration-300">
+                <div className="absolute -top-8 right-8 w-16 h-16 bg-[#E85D04] flex items-center justify-center rounded-sm shadow-lg transform group-hover:-translate-y-2 transition-transform duration-300">
                   <mat.icon className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="font-display text-2xl font-bold uppercase tracking-tight mb-2">{mat.title}</h3>
-                <p className="text-[#FF6B00] font-mono text-sm mb-4 tracking-wider">{mat.spec}</p>
+                <p className="text-[#E85D04] font-mono text-sm mb-4 tracking-wider">{mat.spec}</p>
                 <p className="text-gray-400 text-sm leading-relaxed">{mat.desc}</p>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

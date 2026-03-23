@@ -6,23 +6,36 @@ export const MagneticCursor = () => {
   const textRef = useRef<HTMLDivElement>(null);
   const ballRef = useRef<HTMLDivElement>(null);
   const [isHovering, setIsHovering] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
     const cursor = cursorRef.current;
     const text = textRef.current;
     const ball = ballRef.current;
-    if (!cursor || !text || !ball) return;
+
+    if (!cursor || !text || !ball || isMobile) {
+      return () => {
+        window.removeEventListener('resize', checkMobile);
+      };
+    }
 
     // Set initial position off-screen
     gsap.set(cursor, { x: -100, y: -100 });
 
+    // Use quickSetter for high-performance updates
+    const xSetter = gsap.quickSetter(cursor, "x", "px");
+    const ySetter = gsap.quickSetter(cursor, "y", "px");
+
     const onMouseMove = (e: MouseEvent) => {
-      gsap.to(cursor, {
-        x: e.clientX,
-        y: e.clientY,
-        duration: 0.15,
-        ease: 'power2.out',
-      });
+      xSetter(e.clientX);
+      ySetter(e.clientY);
     };
 
     const onMouseOver = (e: MouseEvent) => {
@@ -54,8 +67,11 @@ export const MagneticCursor = () => {
     return () => {
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseover', onMouseOver);
+      window.removeEventListener('resize', checkMobile);
     };
-  }, []);
+  }, [isMobile]);
+
+  if (isMobile) return null;
 
   return (
     <div

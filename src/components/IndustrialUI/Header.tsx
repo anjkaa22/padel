@@ -1,18 +1,41 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Menu, X, Phone, Globe } from 'lucide-react';
+import { motion, useScroll, useTransform } from 'motion/react';
 
 export const Header = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('');
+  const [targetElement, setTargetElement] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    setTargetElement(document.getElementById('assembly-container'));
   }, []);
+
+  const { scrollYProgress } = useScroll({
+    target: targetElement ? { current: targetElement } : undefined,
+    offset: ["start start", "end start"]
+  });
+
+  // Sync with the assembly animation: 
+  // The assembly finishes and hero text appears towards the end of the pinned section.
+  // We'll fade the header to orange as the assembly completes (between 60% and 90% of the section scroll)
+  const headerBg = useTransform(
+    scrollYProgress,
+    [0.6, 0.9],
+    ['rgba(232, 93, 4, 0)', 'rgba(232, 93, 4, 1)']
+  );
+  
+  const headerPadding = useTransform(scrollYProgress, [0.6, 0.9], ['24px', '16px']);
+  const headerShadow = useTransform(
+    scrollYProgress,
+    [0.6, 0.9],
+    ['0px 0px 0px rgba(0,0,0,0)', '0px 10px 30px rgba(0,0,0,0.2)']
+  );
+
+  // Text and logo colors
+  const logoBg = useTransform(scrollYProgress, [0.6, 0.9], ['#E85D04', '#000000']);
+  const brandText = useTransform(scrollYProgress, [0.6, 0.9], ['#FFFFFF', '#000000']);
+  const navTextColor = useTransform(scrollYProgress, [0.6, 0.9], ['#D1D5DB', '#FFFFFF']);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -52,47 +75,86 @@ export const Header = () => {
   };
 
   return (
-    <header className={`fixed top-0 w-full z-40 transition-all duration-300 ${isScrolled ? 'bg-[#131313]/90 backdrop-blur-md border-b border-gray-800 py-4' : 'bg-transparent py-6'}`}>
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-8 flex items-center justify-between">
+    <motion.header 
+      style={{ 
+        backgroundColor: headerBg,
+        paddingTop: headerPadding,
+        paddingBottom: headerPadding,
+        boxShadow: headerShadow
+      }}
+      className="fixed top-0 w-full z-40 transition-all duration-300"
+    >
+      <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8 flex items-center justify-between">
         <div className="flex items-center gap-2 magnetic cursor-pointer relative z-50">
-          <div className="w-8 h-8 bg-[#E85D04] flex items-center justify-center font-bold text-white text-xl font-display">P</div>
-          <span className="text-white font-bold text-xl tracking-widest uppercase font-display">Zone</span>
+          <motion.div 
+            style={{ backgroundColor: logoBg }}
+            className="w-8 h-8 flex items-center justify-center font-bold text-xl font-display text-white"
+          >
+            P
+          </motion.div>
+          <motion.span 
+            style={{ color: brandText }}
+            className="font-bold text-xl tracking-widest uppercase font-display"
+          >
+            Zone
+          </motion.span>
         </div>
 
         <nav className="hidden lg:flex items-center gap-8">
           {['Assembly', 'Materials', 'Products', 'Calculator', 'Contact'].map((item) => (
-            <a 
+            <motion.a 
               key={item} 
               href={`#${item.toLowerCase()}`} 
               onClick={(e) => handleNavClick(e, item.toLowerCase())}
-              className={`text-sm font-medium uppercase tracking-wider transition-colors magnetic ${activeSection === item.toLowerCase() ? 'text-[#E85D04]' : 'text-gray-300 hover:text-[#E85D04]'}`}
+              style={{ 
+                color: activeSection === item.toLowerCase() 
+                  ? (brandText.get() === '#000000' ? '#000000' : '#E85D04') 
+                  : navTextColor 
+              }}
+              className={`text-sm font-medium uppercase tracking-wider transition-colors magnetic ${
+                activeSection === item.toLowerCase() 
+                  ? 'font-bold border-b-2 border-current' 
+                  : 'hover:text-black'
+              }`}
             >
               {item}
-            </a>
+            </motion.a>
           ))}
           
-          <div className="flex items-center gap-4 ml-4 border-l border-gray-700 pl-8">
-            <a href="tel:+971502895251" className="flex items-center gap-2 text-sm font-medium text-gray-300 hover:text-[#E85D04] transition-colors magnetic">
+          <div className="flex items-center gap-4 ml-4 border-l border-white/10 pl-8 transition-colors duration-300">
+            <motion.a 
+              href="tel:+971502895251" 
+              style={{ color: navTextColor }}
+              className="flex items-center gap-2 text-sm font-medium hover:text-black transition-colors magnetic"
+            >
               <Phone size={16} />
               +971 50 289 5251
-            </a>
-            <a href="tel:+971522204181" className="flex items-center gap-2 text-sm font-medium text-gray-300 hover:text-[#E85D04] transition-colors magnetic">
+            </motion.a>
+            <motion.a 
+              href="tel:+971522204181" 
+              style={{ color: navTextColor }}
+              className="flex items-center gap-2 text-sm font-medium hover:text-black transition-colors magnetic"
+            >
               <Phone size={16} />
               +971 52 220 4181
-            </a>
+            </motion.a>
           </div>
 
-          <button className="flex items-center gap-2 text-sm font-medium text-gray-300 hover:text-[#E85D04] transition-colors magnetic ml-4" aria-label="Toggle Language">
+          <motion.button 
+            style={{ color: navTextColor }}
+            className="flex items-center gap-2 text-sm font-medium hover:text-black transition-colors magnetic ml-4" 
+            aria-label="Toggle Language"
+          >
             <Globe size={16} />
             EN | عربي
-          </button>
+          </motion.button>
           
-          <a href="#contact" onClick={(e) => handleNavClick(e, 'contact')} className="btn-primary py-2 px-4 text-xs ml-2">
+          <a href="#contact" onClick={(e) => handleNavClick(e, 'contact')} className="btn-primary py-2 px-4 text-xs ml-2 bg-black text-white hover:bg-gray-900 border-none">
             Book a Court
           </a>
         </nav>
 
-        <button className="lg:hidden text-white relative z-50 magnetic" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} aria-label="Toggle Menu">
+        <button className="lg:hidden relative z-50 magnetic text-white" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} aria-label="Toggle Menu">
           {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
       </div>
@@ -129,6 +191,6 @@ export const Header = () => {
           </a>
         </div>
       </div>
-    </header>
+    </motion.header>
   );
 };

@@ -33,56 +33,59 @@ export const ContactSection = () => {
     <section id="contact" className="py-32 bg-[#0A0A0A] text-white relative border-t border-gray-900">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-          <div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-            >
-              <h2 className="text-5xl md:text-7xl font-display font-black uppercase tracking-tighter leading-none mb-6">
-                Get In <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B00] to-orange-400">Touch</span>
-              </h2>
-              <p className="text-gray-400 max-w-md text-lg mb-12">
-                Ready to build your dream court or need premium gear? Contact our team of experts today.
-              </p>
-            </motion.div>
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+          >
+            <h2 className="text-5xl md:text-7xl font-display font-black uppercase tracking-tighter leading-none mb-6">
+              Get In <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B00] to-orange-400">Touch</span>
+            </h2>
+            <p className="text-gray-400 max-w-md text-lg mb-12">
+              Ready to build your dream court or need premium gear? Contact our team of experts today.
+            </p>
 
             <div className="space-y-8">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-[#1A1A1A] border border-gray-800 flex items-center justify-center shrink-0">
-                  <Phone className="w-5 h-5 text-[#E85D04]" />
-                </div>
-                <div>
-                  <h4 className="font-display font-bold uppercase tracking-wider mb-1">Call Us</h4>
-                  <a href="tel:+971502895251" className="block text-gray-400 hover:text-[#E85D04] transition-colors">+971 50 289 5251</a>
-                  <a href="tel:+971522204181" className="block text-gray-400 hover:text-[#E85D04] transition-colors">+971 52 220 4181</a>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-[#1A1A1A] border border-gray-800 flex items-center justify-center shrink-0">
-                  <Mail className="w-5 h-5 text-[#E85D04]" />
-                </div>
-                <div>
-                  <h4 className="font-display font-bold uppercase tracking-wider mb-1">Email Us</h4>
-                  <a href="mailto:info@padelzone.ae" className="text-gray-400 hover:text-[#E85D04] transition-colors">info@padelzone.ae</a>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-[#1A1A1A] border border-gray-800 flex items-center justify-center shrink-0">
-                  <MapPin className="w-5 h-5 text-[#E85D04]" />
-                </div>
-                <div>
-                  <h4 className="font-display font-bold uppercase tracking-wider mb-1">Location</h4>
-                  <p className="text-gray-400">Dubai, United Arab Emirates</p>
-                </div>
-              </div>
+              {[
+                { icon: Phone, title: 'Call Us', content: ['+971 50 289 5251', '+971 52 220 4181'], href: ['tel:+971502895251', 'tel:+971522204181'] },
+                { icon: Mail, title: 'Email Us', content: ['info@padelzone.ae'], href: ['mailto:info@padelzone.ae'] },
+                { icon: MapPin, title: 'Location', content: ['Dubai, United Arab Emirates'], href: [] }
+              ].map((item, idx) => (
+                <motion.div 
+                  key={idx} 
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: idx * 0.1 }}
+                  whileHover={{ x: 15, scale: 1.02 }}
+                  className="flex items-start gap-4 group cursor-pointer"
+                >
+                  <div className="w-12 h-12 bg-[#1A1A1A] border border-gray-800 flex items-center justify-center shrink-0 group-hover:border-[#E85D04] group-hover:bg-[#E85D04]/5 transition-all duration-300">
+                    <item.icon className="w-5 h-5 text-[#E85D04]" />
+                  </div>
+                  <div>
+                    <h4 className="font-display font-bold uppercase tracking-wider mb-1 group-hover:text-[#E85D04] transition-colors">{item.title}</h4>
+                    {item.content.map((text, i) => (
+                      item.href[i] ? (
+                        <a key={i} href={item.href[i]} className="block text-gray-400 hover:text-white transition-colors">{text}</a>
+                      ) : (
+                        <p key={i} className="text-gray-400">{text}</p>
+                      )
+                    ))}
+                  </div>
+                </motion.div>
+              ))}
             </div>
-          </div>
+          </motion.div>
 
-          <div className="bg-[#111111] border border-gray-800 p-8 md:p-12 relative">
+          <motion.div 
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+            className="bg-[#111111] border border-gray-800 p-8 md:p-12 relative"
+          >
             {/* Toasts */}
             {status === 'success' && (
               <div className="absolute top-4 right-4 left-4 bg-[#E85D04] text-white p-4 flex items-center gap-3 shadow-lg z-50 animate-fade-in">
@@ -159,7 +162,7 @@ export const ContactSection = () => {
                 {status === 'submitting' ? 'Sending...' : 'Send Message'}
               </button>
             </form>
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

@@ -11,6 +11,7 @@ html, body {
   height: auto;
   min-height: 100%;
   overflow-x: hidden;
+  background: #000000;
 }
 
 html.lenis {
@@ -33,14 +34,7 @@ html.lenis {
   pointer-events: none;
 }
 
-body {
-  cursor: none; /* Hide default cursor */
-}
-
-a, button, .magnetic {
-  cursor: none; /* Ensure default cursor is hidden on hoverable elements too */
-}
-
+/* Cursor handling is moved to App.tsx for responsive control */
 @keyframes pulse-orange {
   0% { box-shadow: 0 0 0 0 rgba(232, 93, 4, 0.7); }
   70% { box-shadow: 0 0 0 15px rgba(232, 93, 4, 0); }

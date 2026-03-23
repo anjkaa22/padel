@@ -1,4 +1,4 @@
-import React, { useRef, useLayoutEffect, useMemo } from 'react';
+import React, { useRef, useEffect, useMemo } from 'react';
 import * as THREE from 'three';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -15,8 +15,8 @@ export const CourtModel = () => {
   const netRef = useRef<THREE.Group>(null);
   
   const { viewport } = useThree();
-  const isMobile = viewport.width < 15;
-  const scale = isMobile ? 0.4 : 0.9; // Adjusted for better mobile fit
+  const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
+  const scale = isMobile ? 0.42 : 0.9; // Reduced from 0.55 to ensure it fits mobile screens better
 
   // Generate realistic diamond chain-link texture for the metal mesh
   const meshTexture = useMemo(() => {
@@ -44,26 +44,26 @@ export const CourtModel = () => {
     return tex;
   }, []);
 
-  // Generate realistic turf noise texture
+  // Generate realistic turf noise texture - Simplified for performance
   const turfTexture = useMemo(() => {
     const canvas = document.createElement('canvas');
-    canvas.width = 512;
-    canvas.height = 512;
+    canvas.width = 256;
+    canvas.height = 256;
     const ctx = canvas.getContext('2d');
     if (ctx) {
       ctx.fillStyle = '#0A3D91';
-      ctx.fillRect(0, 0, 512, 512);
-      // Add noise for artificial grass look
-      for (let i = 0; i < 100000; i++) {
+      ctx.fillRect(0, 0, 256, 256);
+      // Add noise for artificial grass look - reduced iterations
+      for (let i = 0; i < 5000; i++) {
         ctx.fillStyle = Math.random() > 0.5 ? '#08337A' : '#0C47A8';
-        ctx.fillRect(Math.random() * 512, Math.random() * 512, 2, 2);
+        ctx.fillRect(Math.random() * 256, Math.random() * 256, 2, 2);
       }
     }
     const tex = new THREE.CanvasTexture(canvas);
     tex.wrapS = THREE.RepeatWrapping;
     tex.wrapT = THREE.RepeatWrapping;
     tex.repeat.set(8, 16);
-    tex.anisotropy = 16;
+    tex.anisotropy = 4; // Reduced from 16
     return tex;
   }, []);
 
@@ -90,48 +90,74 @@ export const CourtModel = () => {
     return tex;
   }, []);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const ctx = gsap.context(() => {
+      if (!floorRef.current || !glassRef.current || !meshRef.current || !polesRef.current || !netRef.current) return;
+
+      // Refresh ScrollTrigger to ensure correct positions after model is loaded
+      ScrollTrigger.refresh();
+      
       // Initial state: Ground is visible, everything else is hidden far above or below
-      gsap.set(floorRef.current!.position, { y: 0 });
-      gsap.set(glassRef.current!.position, { y: 35 }); // Hidden far above
-      gsap.set(meshRef.current!.position, { y: -35 }); // Hidden far below
-      gsap.set(polesRef.current!.position, { y: 45 }); // Hidden far above
-      gsap.set(netRef.current!.position, { y: -25 }); // Hidden far below
+      gsap.set(floorRef.current.position, { y: 0 });
+      gsap.set(glassRef.current.position, { y: 35 }); // Hidden far above
+      gsap.set(meshRef.current.position, { y: -35 }); // Hidden far below
+      gsap.set(polesRef.current.position, { y: 45 }); // Hidden far above
+      gsap.set(netRef.current.position, { y: -25 }); // Hidden far below
+      
+      // Initial state for hero text (since we removed opacity-0 from HTML for robustness)
+      gsap.set('#hero-top', { opacity: 0, y: -50 });
+      gsap.set('#hero-bottom', { opacity: 0, y: 50 });
       
       // Assembly animation
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: '#assembly-container',
           start: 'top top',
-          end: 'bottom bottom',
-          scrub: 1.5,
+          end: isMobile ? '+=250%' : '+=300%', // Pin for 2.5-3 screen heights
+          scrub: isMobile ? 0.5 : 1.5,
+          pin: true,
+          pinSpacing: true,
+          invalidateOnRefresh: true,
+          anticipatePin: 1,
         }
       });
 
       // Build sequence: Glass (drops down) -> Mesh (rises up) -> Poles (drop down) -> Net (rises up)
-      tl.to(glassRef.current!.position, { y: 0, duration: 1.5, ease: "power3.out" }, 0)
-        .to(meshRef.current!.position, { y: 0, duration: 1.5, ease: "power3.out" }, 0.2)
-        .to(polesRef.current!.position, { y: 0, duration: 1.5, ease: "back.out(1.2)" }, 0.4)
-        .to(netRef.current!.position, { y: 0, duration: 1.5, ease: "back.out(1.2)" }, 0.6)
+      tl.to(glassRef.current.position, { y: 0, duration: 1.5, ease: "power3.out" }, 0)
+        .to(meshRef.current.position, { y: 0, duration: 1.5, ease: "power3.out" }, 0.2)
+        .to(polesRef.current.position, { y: 0, duration: 1.5, ease: "back.out(1.2)" }, 0.4)
+        .to(netRef.current.position, { y: 0, duration: 1.5, ease: "back.out(1.2)" }, 0.6)
         
         // Hide scroll indicator
         .to('#scroll-indicator', { opacity: 0, y: 20, duration: 0.5 }, 0.8)
         
-        // Show hero text at the end
-        .to('#hero-text', { opacity: 1, scale: 1, y: 0, duration: 1.5, ease: "power3.out" }, 1.0);
+        // Show hero content at the end - Top fades from top, Bottom fades from bottom
+        .to('#hero-top', { 
+          opacity: 1, 
+          y: 0, 
+          duration: isMobile ? 0.8 : 1.2, 
+          ease: "power3.out" 
+        }, isMobile ? 0.7 : 0.9)
+        .to('#hero-bottom', { 
+          opacity: 1, 
+          y: 0, 
+          duration: isMobile ? 0.8 : 1.2, 
+          ease: "power3.out" 
+        }, isMobile ? 0.75 : 1.0);
 
       // Continuous slow rotation
-      gsap.to(groupRef.current!.rotation, {
-        y: Math.PI * 2,
-        duration: 40,
-        repeat: -1,
-        ease: 'none'
-      });
+      if (groupRef.current) {
+        gsap.to(groupRef.current.rotation, {
+          y: Math.PI * 2,
+          duration: 40,
+          repeat: -1,
+          ease: 'none'
+        });
+      }
     });
 
     return () => ctx.revert();
-  }, []);
+  }, [isMobile]);
 
   const courtWidth = 10;
   const courtLength = 20;
@@ -145,6 +171,25 @@ export const CourtModel = () => {
   
   const backMeshTex = meshTexture.clone();
   backMeshTex.repeat.set(30, 9);
+
+  // Memoize materials and geometries for better performance
+  const glassMaterial = useMemo(() => new THREE.MeshStandardMaterial({
+    color: glassColor,
+    transparent: true,
+    opacity: 0.3,
+    roughness: 0.1,
+    metalness: 0.1,
+  }), [glassColor]);
+
+  const structureMaterial = useMemo(() => new THREE.MeshStandardMaterial({
+    color: structureColor,
+    metalness: 0.9,
+    roughness: 0.2,
+  }), [structureColor]);
+
+  const boxGeo = useMemo(() => new THREE.BoxGeometry(courtWidth, wallHeight, 0.05), [courtWidth, wallHeight]);
+  const pillarGeo = useMemo(() => new THREE.BoxGeometry(0.1, wallHeight, 0.1), [wallHeight]);
+  const sideGlassGeo = useMemo(() => new THREE.BoxGeometry(0.05, wallHeight, 2), [wallHeight]);
 
   return (
     <group ref={groupRef} scale={scale}>
@@ -178,26 +223,10 @@ export const CourtModel = () => {
         {/* Back Glass (Ends) */}
         {[-courtLength/2, courtLength/2].map((z, idx) => (
           <group key={`back-glass-${idx}`} position={[0, wallHeight/2, z]}>
-            <mesh castShadow receiveShadow>
-              <boxGeometry args={[courtWidth, wallHeight, 0.05]} />
-              <meshPhysicalMaterial 
-                color={glassColor} 
-                transmission={0.98} 
-                opacity={1} 
-                transparent 
-                roughness={0.02} 
-                ior={1.5} 
-                thickness={0.1}
-                clearcoat={1}
-                clearcoatRoughness={0.1}
-              />
-            </mesh>
-            {/* Structural Pillars for back wall */}
-            {[-5, -3, -1, 1, 3, 5].map((x, pIdx) => (
-              <mesh key={`pillar-${pIdx}`} position={[x === -5 ? -4.95 : x === 5 ? 4.95 : x, 0, z > 0 ? 0.05 : -0.05]} castShadow>
-                <boxGeometry args={[0.1, wallHeight, 0.1]} />
-                <meshStandardMaterial color={structureColor} metalness={0.9} roughness={0.2} />
-              </mesh>
+            <mesh castShadow receiveShadow geometry={boxGeo} material={glassMaterial} />
+            {/* Structural Pillars for back wall - Reduced on mobile */}
+            {(isMobile ? [-5, 0, 5] : [-5, -3, -1, 1, 3, 5]).map((x, pIdx) => (
+              <mesh key={`pillar-${pIdx}`} position={[x === -5 ? -4.95 : x === 5 ? 4.95 : x, 0, z > 0 ? 0.05 : -0.05]} castShadow={!isMobile} geometry={pillarGeo} material={structureMaterial} />
             ))}
           </group>
         ))}
@@ -205,20 +234,7 @@ export const CourtModel = () => {
         {/* Side Glass (First 2m from corners) */}
         {[-courtWidth/2, courtWidth/2].map((x, i) => 
           [-courtLength/2 + 1, courtLength/2 - 1].map((z, j) => (
-            <mesh key={`side-glass-${i}-${j}`} position={[x, wallHeight/2, z]} castShadow receiveShadow>
-              <boxGeometry args={[0.05, wallHeight, 2]} />
-              <meshPhysicalMaterial 
-                color={glassColor} 
-                transmission={0.98} 
-                opacity={1} 
-                transparent 
-                roughness={0.02} 
-                ior={1.5} 
-                thickness={0.1}
-                clearcoat={1}
-                clearcoatRoughness={0.1}
-              />
-            </mesh>
+            <mesh key={`side-glass-${i}-${j}`} position={[x, wallHeight/2, z]} castShadow receiveShadow geometry={sideGlassGeo} material={glassMaterial} />
           ))
         )}
       </group>
@@ -240,9 +256,9 @@ export const CourtModel = () => {
                 roughness={0.3} 
               />
             </mesh>
-            {/* Side Pillars */}
-            {[-8, -6, -4, -2, 0, 2, 4, 6, 8].map((z, pIdx) => (
-              <mesh key={`side-pillar-${pIdx}`} position={[x > 0 ? 0.05 : -0.05, 0, z]} castShadow>
+            {/* Side Pillars - Reduced on mobile */}
+            {(isMobile ? [-8, -4, 0, 4, 8] : [-8, -6, -4, -2, 0, 2, 4, 6, 8]).map((z, pIdx) => (
+              <mesh key={`side-pillar-${pIdx}`} position={[x > 0 ? 0.05 : -0.05, 0, z]} castShadow={!isMobile}>
                 <boxGeometry args={[0.1, wallHeight, 0.1]} />
                 <meshStandardMaterial color={structureColor} metalness={0.9} roughness={0.2} />
               </mesh>
@@ -251,13 +267,13 @@ export const CourtModel = () => {
         ))}
       </group>
 
-      {/* 4. LIGHTING POLES */}
+      {/* 4. LIGHTING POLES - Reduced on mobile */}
       <group ref={polesRef}>
         {[-courtWidth/2 - 0.2, courtWidth/2 + 0.2].map((x, i) => 
-          [-courtLength/4, courtLength/4].map((z, j) => (
+          (isMobile ? [0] : [-courtLength/4, courtLength/4]).map((z, j) => (
             <group key={`pole-${i}-${j}`} position={[x, 0, z]}>
               {/* Main Pole */}
-              <mesh position={[0, 3, 0]} castShadow>
+              <mesh position={[0, 3, 0]} castShadow={!isMobile}>
                 <boxGeometry args={[0.15, 6, 0.15]} />
                 <meshStandardMaterial color={structureColor} metalness={0.9} roughness={0.2} />
               </mesh>
@@ -271,16 +287,18 @@ export const CourtModel = () => {
                 <boxGeometry args={[0.8, 0.05, 0.4]} />
                 <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={5} />
               </mesh>
-              {/* Actual Light Source */}
-              <spotLight 
-                position={[x > 0 ? -0.8 : 0.8, 5.9, 0]} 
-                target-position={[0, 0, z]} 
-                intensity={2.5} 
-                angle={Math.PI/3} 
-                penumbra={0.8} 
-                castShadow 
-                color="#fff5e6"
-              />
+              {/* Actual Light Source - Disabled on mobile to save draw calls */}
+              {!isMobile && (
+                <spotLight 
+                  position={[x > 0 ? -0.8 : 0.8, 5.9, 0]} 
+                  target-position={[0, 0, z]} 
+                  intensity={2.5} 
+                  angle={Math.PI/3} 
+                  penumbra={0.8} 
+                  castShadow 
+                  color="#fff5e6"
+                />
+              )}
             </group>
           ))
         )}

@@ -11,7 +11,7 @@ export const FloatingWhatsApp = () => {
       aria-label="Chat with us on WhatsApp"
     >
       <MessageCircle className="w-7 h-7" />
-      <span className="absolute right-full mr-4 bg-white text-black px-4 py-2 rounded-lg text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap shadow-lg">
+      <span className="hidden md:block absolute right-full mr-4 bg-white text-black px-4 py-2 rounded-lg text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap shadow-lg">
         Chat with us!
       </span>
     </a>

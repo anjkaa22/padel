@@ -29,72 +29,96 @@ export const CostCalculator = () => {
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
           className="flex flex-col md:flex-row md:items-center gap-6 mb-16"
         >
           <div className="w-16 h-16 bg-[#1A1A1A] border border-gray-800 flex items-center justify-center">
-            <Settings2 className="w-8 h-8 text-[#FF6B00]" />
+            <Settings2 className="w-8 h-8 text-[#E85D04]" />
           </div>
-          <h2 className="text-5xl md:text-7xl font-display font-black uppercase tracking-tighter leading-none">Court <br className="hidden md:block"/>Configurator</h2>
+          <h2 className="text-4xl sm:text-5xl md:text-7xl font-display font-black uppercase tracking-tighter leading-none">Court <br className="hidden sm:block"/>Configurator</h2>
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
-          <div className="lg:col-span-2 space-y-16">
+          <motion.div 
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="lg:col-span-2 space-y-16"
+          >
             {/* Court Type */}
             <div>
-              <h3 className="text-sm font-bold mb-8 text-[#FF6B00] uppercase tracking-[0.2em]">01. Select Court Type</h3>
+              <h3 className="text-sm font-bold mb-8 text-[#E85D04] uppercase tracking-[0.2em]">01. Select Court Type</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {COURT_TYPES.map(type => (
-                  <button
+                  <motion.button
                     key={type.id}
                     onClick={() => setSelectedType(type)}
+                    whileHover={{ 
+                      scale: 1.02,
+                      borderColor: '#E85D04',
+                      boxShadow: '0 10px 30px rgba(232, 93, 4, 0.1)'
+                    }}
+                    whileTap={{ scale: 0.98 }}
                     className={`p-8 border text-left transition-all duration-300 magnetic ${
                       selectedType.id === type.id 
-                        ? 'border-[#FF6B00] bg-[#FF6B00]/5' 
+                        ? 'border-[#E85D04] bg-[#E85D04]/5' 
                         : 'border-gray-800 hover:border-gray-600 bg-[#111111]'
                     }`}
                   >
                     <div className="flex justify-between items-start mb-6">
                       <h4 className="text-2xl font-display font-bold uppercase tracking-tight">{type.name}</h4>
-                      {selectedType.id === type.id && <Check className="w-6 h-6 text-[#FF6B00]" />}
+                      {selectedType.id === type.id && <Check className="w-6 h-6 text-[#E85D04]" />}
                     </div>
                     <p className="text-gray-400 text-sm leading-relaxed">{type.desc}</p>
-                  </button>
+                  </motion.button>
                 ))}
               </div>
             </div>
 
             {/* Add-ons */}
             <div>
-              <h3 className="text-sm font-bold mb-8 text-[#FF6B00] uppercase tracking-[0.2em]">02. Select Add-ons</h3>
+              <h3 className="text-sm font-bold mb-8 text-[#E85D04] uppercase tracking-[0.2em]">02. Select Add-ons</h3>
               <div className="space-y-4">
                 {ADDONS.map(addon => (
-                  <button
+                  <motion.button
                     key={addon.id}
                     onClick={() => toggleAddon(addon.id)}
+                    whileHover={{ 
+                      x: 10, 
+                      borderColor: '#E85D04',
+                      boxShadow: '0 5px 15px rgba(232, 93, 4, 0.05)'
+                    }}
+                    whileTap={{ scale: 0.99 }}
                     className={`w-full p-6 border flex items-center justify-between transition-all duration-300 magnetic ${
                       selectedAddons.includes(addon.id)
-                        ? 'border-[#FF6B00] bg-[#FF6B00]/5'
+                        ? 'border-[#E85D04] bg-[#E85D04]/5'
                         : 'border-gray-800 hover:border-gray-600 bg-[#111111]'
                     }`}
                   >
                     <div className="flex items-center gap-6">
                       <div className={`w-6 h-6 border flex items-center justify-center transition-colors ${
-                        selectedAddons.includes(addon.id) ? 'border-[#FF6B00] bg-[#FF6B00]' : 'border-gray-600'
+                        selectedAddons.includes(addon.id) ? 'border-[#E85D04] bg-[#E85D04]' : 'border-gray-600'
                       }`}>
                         {selectedAddons.includes(addon.id) && <Check className="w-4 h-4 text-white" />}
                       </div>
                       <span className="font-bold font-display text-lg uppercase tracking-wide">{addon.name}</span>
                     </div>
-                  </button>
+                  </motion.button>
                 ))}
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Summary */}
-          <div className="lg:col-span-1">
+          <motion.div 
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+            className="lg:col-span-1"
+          >
             <div className="sticky top-32 p-6 md:p-10 border border-gray-800 bg-[#111111]">
               <h3 className="text-xl md:text-2xl font-display font-black mb-6 md:mb-8 uppercase tracking-tighter border-b border-gray-800 pb-4 md:pb-6">Configuration Summary</h3>
               
@@ -111,7 +135,7 @@ export const CostCalculator = () => {
                       const addon = ADDONS.find(a => a.id === id)!;
                       return (
                         <div key={id} className="flex items-center gap-3">
-                          <div className="w-1.5 h-1.5 bg-[#FF6B00]" />
+                          <div className="w-1.5 h-1.5 bg-[#E85D04]" />
                           <span className="text-gray-300 font-medium text-sm uppercase tracking-wide">{addon.name}</span>
                         </div>
                       );
@@ -121,7 +145,7 @@ export const CostCalculator = () => {
               </div>
 
               <div className="flex flex-col gap-3 mt-4">
-                <button className="w-full py-5 bg-[#FF6B00] text-white font-black uppercase tracking-[0.2em] text-sm hover:bg-[#e66000] transition-colors magnetic">
+                <button className="w-full py-5 bg-[#E85D04] text-white font-black uppercase tracking-[0.2em] text-sm hover:bg-[#e66000] transition-colors magnetic">
                   Request Formal Quote
                 </button>
                 <button className="w-full py-4 bg-transparent border border-gray-700 text-gray-300 font-bold uppercase tracking-[0.2em] text-xs hover:border-white hover:text-white transition-colors magnetic">
@@ -133,7 +157,7 @@ export const CostCalculator = () => {
                 Our team will contact you within 24 hours to discuss your project requirements.
               </p>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

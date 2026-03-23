@@ -36,6 +36,19 @@ const PRODUCTS = [
 
 const CATEGORIES = ['All', 'Rackets', 'Balls', 'Accessories'];
 
+const cardVariants: any = {
+  hidden: { opacity: 0, y: 30 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      delay: i * 0.1,
+      ease: "easeOut",
+    }
+  })
+};
+
 export const ProductsSection = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState('');
@@ -67,8 +80,8 @@ export const ProductsSection = () => {
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
           >
             <h2 className="text-5xl md:text-7xl font-display font-black uppercase tracking-tighter leading-none mb-6">
               Elite <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B00] to-orange-400">Gear</span>
@@ -81,8 +94,8 @@ export const ProductsSection = () => {
           <motion.div 
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.4, delay: 0.2, ease: "easeOut" }}
             className="flex flex-wrap gap-2"
           >
             {CATEGORIES.map(category => (
@@ -102,15 +115,22 @@ export const ProductsSection = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {filteredProducts.map((product, index) => (
-            <motion.div 
-              key={product.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="bg-[#1A1A1A] border border-gray-800 group hover:border-[#E85D04] transition-all duration-300 flex flex-col hover:-translate-y-2 relative"
-            >
+            {filteredProducts.map((product, index) => (
+              <motion.div 
+                key={product.id}
+                custom={index}
+                variants={cardVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.1 }}
+                whileHover={{ 
+                  y: -10, 
+                  borderColor: '#E85D04',
+                  boxShadow: '0 20px 40px rgba(232, 93, 4, 0.15)',
+                  scale: 1.02
+                }}
+                className="bg-[#1A1A1A] border border-gray-800 group transition-all duration-300 flex flex-col relative"
+              >
               {product.bestseller && (
                 <div className="absolute top-4 left-4 z-10 bg-[#E85D04] text-white text-xs font-bold uppercase tracking-widest px-3 py-1">
                   Bestseller
