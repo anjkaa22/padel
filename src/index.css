@@ -1,95 +1,89 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Montserrat:wght@900&family=Space+Grotesk:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Outfit", ui-sans-serif, system-ui, sans-serif;
-  
-  --color-primary: var(--color-primary);
-  --color-primary-hover: var(--color-primary-hover);
-  --color-accent: var(--color-accent);
-  --color-surface: var(--color-surface);
-  --color-surface-hover: var(--color-surface-hover);
-  --color-background: var(--color-background);
-  --color-text: var(--color-text);
-  --color-muted: var(--color-muted);
-  --color-border: var(--color-border);
-  
-  --color-success: #10b981;
-  --color-danger: #ef4444;
-  --color-warning: #f59e0b;
-}
-
-@layer base {
-  :root {
-    --color-primary: #10b981; /* Emerald green for padel */
-    --color-primary-hover: #059669;
-    --color-accent: #f97316;
-    --color-background: #f8fafc;
-    --color-surface: #ffffff;
-    --color-surface-hover: #f1f5f9;
-    --color-text: #0f172a;
-    --color-muted: #64748b;
-    --color-border: #e2e8f0;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --color-primary: #10b981;
-      --color-primary-hover: #34d399;
-      --color-accent: #f97316;
-      --color-background: #0f172a;
-      --color-surface: #1e293b;
-      --color-surface-hover: #334155;
-      --color-text: #f8fafc;
-      --color-muted: #94a3b8;
-      --color-border: #334155;
-    }
-  }
+  --font-display: "Montserrat", "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 }
 
 html, body {
   height: auto;
   min-height: 100%;
-  background-color: var(--color-background);
-  color: var(--color-text);
-  font-family: var(--font-sans);
-  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
+html.lenis {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+body {
+  cursor: none; /* Hide default cursor */
+}
+
+a, button, .magnetic {
+  cursor: none; /* Ensure default cursor is hidden on hoverable elements too */
+}
+
+@keyframes pulse-orange {
+  0% { box-shadow: 0 0 0 0 rgba(232, 93, 4, 0.7); }
+  70% { box-shadow: 0 0 0 15px rgba(232, 93, 4, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(232, 93, 4, 0); }
+}
+
+.animate-pulse-orange {
+  animation: pulse-orange 3s infinite;
+}
+
+/* Base typography */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
+  font-weight: 900;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: var(--color-border);
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-muted);
+/* Focus states for accessibility */
+*:focus-visible {
+  outline: 2px solid #E85D04;
+  outline-offset: 2px;
 }
 
-/* Hide scrollbar for horizontal scrolling areas */
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
+/* Primary Button Style */
+.btn-primary {
+  @apply bg-[#E85D04] text-white px-6 py-3 rounded-none font-bold uppercase tracking-wider transition-all duration-300 min-h-[44px] min-w-[44px] flex items-center justify-center;
 }
-.hide-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+.btn-primary:hover {
+  @apply shadow-[0_0_20px_rgba(232,93,4,0.4)];
 }
 
-/* Base utilities */
-.glass-panel {
-  background: rgba(var(--color-surface), 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--color-border);
+/* Secondary Button Style */
+.btn-secondary {
+  @apply bg-transparent border-2 border-[#2D2D2D] text-white px-6 py-3 rounded-none font-bold uppercase tracking-wider transition-all duration-300 min-h-[44px] min-w-[44px] flex items-center justify-center;
+}
+.btn-secondary:hover {
+  @apply border-[#E85D04] shadow-[0_0_20px_rgba(232,93,4,0.4)];
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
