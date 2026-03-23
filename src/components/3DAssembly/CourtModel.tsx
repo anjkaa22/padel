@@ -228,8 +228,8 @@ export const CourtModel = () => {
         {/* Side Mesh (Middle 16m) */}
         {[-courtWidth/2, courtWidth/2].map((x, i) => (
           <group key={`side-mesh-${i}`} position={[x, wallHeight/2, 0]}>
-            <mesh castShadow>
-              <planeGeometry args={[16, wallHeight]} rotation={[0, x > 0 ? Math.PI/2 : -Math.PI/2, 0]} />
+            <mesh castShadow rotation={[0, x > 0 ? Math.PI/2 : -Math.PI/2, 0]}>
+              <planeGeometry args={[16, wallHeight]} />
               <meshStandardMaterial 
                 color={structureColor} 
                 alphaMap={sideMeshTex} 

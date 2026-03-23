@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Shield, Zap, Droplets, Wind } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { motion } from 'motion/react';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -65,7 +66,13 @@ export const MaterialGrid = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
-        <div className="mb-24">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="mb-24"
+        >
           <h2 className="font-display text-6xl md:text-8xl font-black uppercase tracking-tighter mb-6 leading-[0.9]">
             Industrial <br className="hidden md:block" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B00] to-orange-400">Grade</span>
@@ -73,7 +80,7 @@ export const MaterialGrid = () => {
           <p className="text-lg md:text-xl text-gray-400 max-w-2xl font-light leading-relaxed">
             Engineered for the extreme Middle Eastern climate. Our courts combine structural integrity with aesthetic perfection.
           </p>
-        </div>
+        </motion.div>
 
         <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {MATERIALS.map((mat, idx) => (
@@ -82,6 +89,7 @@ export const MaterialGrid = () => {
                 <img 
                   src={mat.image} 
                   alt={mat.title} 
+                  loading="lazy"
                   className="w-full h-full object-cover opacity-40 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700 grayscale group-hover:grayscale-0"
                 />
               </div>

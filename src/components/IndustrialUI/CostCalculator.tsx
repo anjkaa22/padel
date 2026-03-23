@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Settings2, Check } from 'lucide-react';
+import { motion } from 'motion/react';
 
 const COURT_TYPES = [
   { id: 'classic', name: 'Classic Court', desc: 'Standard pillar structure with robust steel frames.' },
@@ -25,12 +26,18 @@ export const CostCalculator = () => {
   return (
     <section className="py-32 bg-[#0A0A0A] text-white border-t border-gray-900" id="calculator">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row md:items-center gap-6 mb-16">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="flex flex-col md:flex-row md:items-center gap-6 mb-16"
+        >
           <div className="w-16 h-16 bg-[#1A1A1A] border border-gray-800 flex items-center justify-center">
             <Settings2 className="w-8 h-8 text-[#FF6B00]" />
           </div>
           <h2 className="text-5xl md:text-7xl font-display font-black uppercase tracking-tighter leading-none">Court <br className="hidden md:block"/>Configurator</h2>
-        </div>
+        </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
           <div className="lg:col-span-2 space-y-16">
@@ -113,11 +120,17 @@ export const CostCalculator = () => {
                 )}
               </div>
 
-              <button className="w-full py-5 bg-[#FF6B00] text-white font-black uppercase tracking-[0.2em] text-sm hover:bg-[#e66000] transition-colors magnetic mt-4">
-                Request Formal Quote
-              </button>
+              <div className="flex flex-col gap-3 mt-4">
+                <button className="w-full py-5 bg-[#FF6B00] text-white font-black uppercase tracking-[0.2em] text-sm hover:bg-[#e66000] transition-colors magnetic">
+                  Request Formal Quote
+                </button>
+                <button className="w-full py-4 bg-transparent border border-gray-700 text-gray-300 font-bold uppercase tracking-[0.2em] text-xs hover:border-white hover:text-white transition-colors magnetic">
+                  Download PDF Quote
+                </button>
+              </div>
               <p className="text-xs text-gray-500 mt-6 text-center leading-relaxed">
-                * Our team will contact you within 24 hours to discuss your project requirements.
+                * Prices are estimates and subject to site inspection.<br/>
+                Our team will contact you within 24 hours to discuss your project requirements.
               </p>
             </div>
           </div>
